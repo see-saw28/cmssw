@@ -116,7 +116,7 @@ run2_egamma_2017.toModify(
 
 run2_egamma_2018.toModify(
     calibratedPatPhotonsNano,
-    correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2018_29Sep2020_RunFineEtaR9Gain")
+    correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/EGMScalesSmearing_Ele_2018.v1.json.gz")
 )
 
 slimmedPhotonsWithUserData = cms.EDProducer("PATPhotonUserDataEmbedder",
@@ -168,7 +168,13 @@ run2_egamma.toModify(slimmedPhotonsWithUserData.userFloats,
 
 run2_egamma.toModify(
     slimmedPhotonsWithUserData.userFloats,
+    Scale                       = cms.InputTag("calibratedPatPhotonsNano","energyScaleValue"),
+    Smear                       = cms.InputTag("calibratedPatPhotonsNano","energySigmaValue"),
+    etIn                     = cms.InputTag("calibratedPatPhotonsNano","energySigmaRhoUp"),
+    scEtaIn                       = cms.InputTag("calibratedPatPhotonsNano","energySigmaRhoDown"),
+    r9In                       = cms.InputTag("calibratedPatPhotonsNano","energySigmaPhiUp"),
     ecalEnergyErrPostCorrNew = cms.InputTag("calibratedPatPhotonsNano","ecalEnergyErrPostCorr"),
+    ecalEnergyErrPreCorrNew = cms.InputTag("calibratedPatPhotonsNano","ecalEnergyErrPreCorr"),
     ecalEnergyPreCorrNew     = cms.InputTag("calibratedPatPhotonsNano","ecalEnergyPreCorr"),
     ecalEnergyPostCorrNew    = cms.InputTag("calibratedPatPhotonsNano","ecalEnergyPostCorr"),
     energyScaleUpNew            = cms.InputTag("calibratedPatPhotonsNano","energyScaleUp"),
@@ -193,7 +199,7 @@ photonTable = simplePATPhotonFlatTableProducer.clone(
         energyErr = Var("getCorrectedEnergyError('regression2')",float,doc="energy error of the cluster from regression",precision=10),
         energyRaw = Var("superCluster().rawEnergy()",float,doc="raw energy of photon supercluster", precision=10),
         superclusterEta  = Var("superCluster().eta()",float,doc="supercluster eta",precision=10),
-        r9 = Var("full5x5_r9()",float,doc="R9 of the supercluster, calculated with full 5x5 region",precision=10),
+        r9 = Var("full5x5_r9()",float,doc="R9 of the supercluster, calculated with full 5x5 region",precision=-1),
         sieie = Var("full5x5_sigmaIetaIeta()",float,doc="sigma_IetaIeta of the supercluster, calculated with full 5x5 region",precision=10),
         sipip = Var("showerShapeVariables().sigmaIphiIphi", float, doc="sigmaIphiIphi of the supercluster", precision=10),
         sieip = Var("full5x5_showerShapeVariables().sigmaIetaIphi",float,doc="sigma_IetaIphi of the supercluster, calculated with full 5x5 region",precision=10),
@@ -283,6 +289,12 @@ run2_egamma.toModify(
     photonTable.variables,
     pt = Var("pt*userFloat('ecalEnergyPostCorrNew')/userFloat('ecalEnergyPreCorrNew')", float, precision=-1, doc="p_{T}"),
     energyErr = Var("userFloat('ecalEnergyErrPostCorrNew')",float,doc="energy error of the cluster from regression",precision=6),
+    energyErrPreCorr = Var("userFloat('ecalEnergyErrPreCorrNew')",float,doc="energy error of the cluster from regression",precision=6),
+    Scale = Var("userFloat('Scale')", float, precision=-1, doc="energy error of the cluster-track combination"),
+    Smear = Var("userFloat('Smear')", float, precision=-1, doc="energy error of the cluster-track combination"),
+    etIn = Var("userFloat('etIn')", float, precision=-1, doc="energy error of the cluster-track combination"),
+    scEtaIn = Var("userFloat('scEtaIn')", float, precision=-1, doc="energy error of the cluster-track combination"),
+    r9In = Var("userFloat('r9In')", float, precision=-1, doc="energy error of the cluster-track combination"),
     ptPreCorr = Var("pt",float,doc="pt of the photon before energy corrections"),
     cutBased = Var(
             "userInt('cutBasedID_Fall17V2_loose')+userInt('cutBasedID_Fall17V2_medium')+userInt('cutBasedID_Fall17V2_tight')",

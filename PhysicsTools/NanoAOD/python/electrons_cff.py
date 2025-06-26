@@ -138,11 +138,15 @@ calibratedPatElectronsNano = RecoEgamma.EgammaTools.calibratedEgammas_cff.calibr
 run2_egamma_2017.toModify(
     calibratedPatElectronsNano,
     correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2017_24Feb2020_runEtaR9Gain_v2"
+    
 )
 
 run2_egamma_2018.toModify(
     calibratedPatElectronsNano,
-    correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2018_29Sep2020_RunFineEtaR9Gain"
+    # correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2018_29Sep2020_RunFineEtaR9Gain"
+    correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/EGMScalesSmearing_Ele_2018.v1.json.gz",
+    # correctionSetScale = "EGMScale_Compound_Ele_2018",
+    # correctionSetSmear = "EGMSmearAndSyst_ElePTsplit_2018"
 )
 ##############################end calibratedPatElectronsNano############################33
 
@@ -236,6 +240,8 @@ run2_egamma.toModify(
     ecalTrkEnergyErrPostCorrNew = cms.InputTag("calibratedPatElectronsNano","ecalTrkEnergyErrPostCorr"),
     ecalTrkEnergyPreCorrNew     = cms.InputTag("calibratedPatElectronsNano","ecalTrkEnergyPreCorr"),
     ecalTrkEnergyPostCorrNew    = cms.InputTag("calibratedPatElectronsNano","ecalTrkEnergyPostCorr"),
+    Scale                       = cms.InputTag("calibratedPatElectronsNano","energyScaleValue"),
+    Smear                       = cms.InputTag("calibratedPatElectronsNano","energySigmaValue"),
     energyScaleUpNew            = cms.InputTag("calibratedPatElectronsNano","energyScaleUp"),
     energyScaleDownNew          = cms.InputTag("calibratedPatElectronsNano","energyScaleDown"),
     energySigmaUpNew            = cms.InputTag("calibratedPatElectronsNano","energySigmaUp"),
@@ -457,6 +463,8 @@ _eleVarsExtra = cms.PSet(
         electronTable.variables,
         pt = Var("pt*userFloat('ecalTrkEnergyPostCorrNew')/userFloat('ecalTrkEnergyPreCorrNew')", float, precision=-1, doc="p_{T}"),
         energyErr = Var("userFloat('ecalTrkEnergyErrPostCorrNew')", float, precision=6, doc="energy error of the cluster-track combination"),
+        Scale = Var("userFloat('Scale')", float, precision=-1, doc="energy error of the cluster-track combination"),
+        Smear = Var("userFloat('Smear')", float, precision=-1, doc="energy error of the cluster-track combination"),
         ptPreCorr = Var("pt", float, doc="pt of the electron before energy corrections"),
         scEtOverPt = Var("(superCluster().energy()/(pt*userFloat('ecalTrkEnergyPostCorrNew')/userFloat('ecalTrkEnergyPreCorrNew')*cosh(superCluster().eta())))-1",float,doc="(supercluster transverse energy)/pt-1",precision=8),
         dEscaleUp=Var("userFloat('ecalTrkEnergyPostCorrNew')-userFloat('energyScaleUpNew')", float,  doc="ecal energy scale shifted 1 sigma up(adding gain/stat/syst in quadrature)", precision=8),
@@ -529,7 +537,7 @@ electronMCTable = cms.EDProducer("CandMCMatchTableProducer",
     genparticles     = cms.InputTag("finalGenParticles"),
 )
 
-electronTask = cms.Task(bitmapVIDForEle,bitmapVIDForEleFall17V2,bitmapVIDForEleHEEP,isoForEle,isoForEleFall17V2,ptRatioRelForEle,seedGainEle,calibratedPatElectronsNano,slimmedElectronsWithUserData,finalElectrons)
+electronTask = cms.Task(bitmapVIDForEle,bitmapVIDForEleFall17V2,bitmapVIDForEleHEEP,isoForEle,isoForEleFall17V2,ptRatioRelForEle,seedGainEle,slimmedElectronsWithUserData,finalElectrons)
 electronTablesTask = cms.Task(electronPROMPTMVA, electronTable)
 electronMCTask = cms.Task(tautaggerForMatching, matchingElecPhoton, electronsMCMatchForTable, electronsMCMatchForTableAlt, electronMCTable)
 

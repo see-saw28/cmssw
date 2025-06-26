@@ -52,7 +52,6 @@ public:
 private:
   void setEnergyAndSystVarations(const float scale,
                                  const float smearNrSigma,
-                                 const float et,
                                  const EnergyScaleCorrection::ScaleCorrection& scaleCorr,
                                  const EnergyScaleCorrection::SmearCorrection& smearCorr,
                                  reco::Photon& photon,
