@@ -55,7 +55,8 @@ private:
                                  const EnergyScaleCorrection::ScaleCorrection& scaleCorr,
                                  const EnergyScaleCorrection::SmearCorrection& smearCorr,
                                  reco::Photon& photon,
-                                 std::array<float, EGEnergySysIndex::kNrSysErrs>& energyData) const;
+                                 std::array<float, EGEnergySysIndex::kNrSysErrs>& energyData,
+                                 const bool isMC) const;
 
   /// Return a number distributed as a unit gaussian, drawn from the private RNG if initPrivateRng was called,
   /// or from the CMSSW RandomNumberGenerator service

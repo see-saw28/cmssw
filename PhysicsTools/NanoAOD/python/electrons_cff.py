@@ -143,10 +143,8 @@ run2_egamma_2017.toModify(
 
 run2_egamma_2018.toModify(
     calibratedPatElectronsNano,
-    # correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2018_29Sep2020_RunFineEtaR9Gain"
-    correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/EGMScalesSmearing_Ele_2018.v1.json.gz",
-    # correctionSetScale = "EGMScale_Compound_Ele_2018",
-    # correctionSetSmear = "EGMSmearAndSyst_ElePTsplit_2018"
+    correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/EGMScalesSmearing_Ele_2018.v1.json.gz:EGMScale_Compound_Ele_2018:EGMSmearAndSyst_ElePTsplit_2018",
+
 )
 ##############################end calibratedPatElectronsNano############################33
 

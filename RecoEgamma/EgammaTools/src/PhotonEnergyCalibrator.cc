@@ -74,15 +74,15 @@ std::array<float, EGEnergySysIndex::kNrSysErrs> PhotonEnergyCalibrator::calibrat
 
   std::array<float, EGEnergySysIndex::kNrSysErrs> uncertainties{};
 
-
+  
   //MC central values are not scaled (scale = 1.0), data is not smeared (smearNrSigma = 0)
   //smearing still has a second order effect on data as it enters the E/p combination as an
   //extra uncertainty on the calo energy
   //MC gets all the scale systematics
   if (eventType == EventType::DATA) {
-    setEnergyAndSystVarations(scaleCorr->scale(), 0., *scaleCorr, *smearCorr, photon, uncertainties);
+    setEnergyAndSystVarations(scaleCorr->scale(), 0., *scaleCorr, *smearCorr, photon, uncertainties, false);
   } else if (eventType == EventType::MC) {
-    setEnergyAndSystVarations(1.0, smearNrSigma, *scaleCorr, *smearCorr, photon, uncertainties);
+    setEnergyAndSystVarations(1.0, smearNrSigma, *scaleCorr, *smearCorr, photon, uncertainties, true);
   }
 
   return uncertainties;
@@ -94,39 +94,72 @@ void PhotonEnergyCalibrator::setEnergyAndSystVarations(
     const EnergyScaleCorrection::ScaleCorrection& scaleCorr,
     const EnergyScaleCorrection::SmearCorrection& smearCorr,
     reco::Photon& photon,
-    std::array<float, EGEnergySysIndex::kNrSysErrs>& energyData) const {
+    std::array<float, EGEnergySysIndex::kNrSysErrs>& energyData,
+    const bool isMC) const {
 
+  // Get smear and systematics variations
   const float smear = smearCorr.sigma();
   const float smearUp = smearCorr.sigmaUp();
   const float smearDn = smearCorr.sigmaDown();
 
-  const float corr = scale + smear * smearNrSigma;
-  const float corrSmearUp = scale + smearUp * smearNrSigma;
-  const float corrSmearDn = scale + smearDn * smearNrSigma;
-  
-  const float corrScaleUp = smearCorr.scaleUp();
-  const float corrScaleDn = smearCorr.scaleDown();
+  // In data we need to apply the nominal scale AND the scale uncertainties
+  // In MC we need to apply only the scale uncertainties
+  // scaleCorr.scaleUp() = scaleCorr.scale() x smearCorr.scaleUp()
+  // scaleCorr.scaleDown() = scaleCorr.scale() x smearCorr.scaleDown()
+  float scaleUp = 1.0, scaleDn = 1.0;
+  if (isMC) {
+    scaleUp = smearCorr.scaleUp();
+    scaleDn = smearCorr.scaleDown();
+  } else {
+    scaleUp = scaleCorr.scaleUp();
+    scaleDn = scaleCorr.scaleDown();
+  }
+    
 
+  // Store scale and smear values
+  energyData[EGEnergySysIndex::kScaleValue] = scale;
+  energyData[EGEnergySysIndex::kSmearValue] = smear;  //even though we use scale = 1.0, we still store the value returned for MC
+  energyData[EGEnergySysIndex::kSmearNrSigma] = smearNrSigma;
+
+  energyData[EGEnergySysIndex::kSmearUpValue] = smearUp;
+  energyData[EGEnergySysIndex::kSmearDownValue] = smearDn;
+  energyData[EGEnergySysIndex::kScaleUpValue] = scaleUp;
+  energyData[EGEnergySysIndex::kScaleDownValue] = scaleDn;
+
+
+
+  // Store pre-correction values
   const double oldEcalEnergy = photon.getCorrectedEnergy(reco::Photon::P4type::regression2);
   const double oldEcalEnergyError = photon.getCorrectedEnergyError(reco::Photon::P4type::regression2);
 
   energyData[EGEnergySysIndex::kEcalPreCorr] = oldEcalEnergy;
   energyData[EGEnergySysIndex::kEcalErrPreCorr] = oldEcalEnergyError;
 
-  const double newEcalEnergy = oldEcalEnergy * corr;
-  const double newEcalEnergyError = std::hypot(oldEcalEnergyError * corr, smear * newEcalEnergy);
-  photon.setCorrectedEnergy(reco::Photon::P4type::regression2, newEcalEnergy, newEcalEnergyError, true);
+  // Compute sytematics variations
+  const float corrSmearUp = scale   * (1 + smearUp * smearNrSigma);
+  const float corrSmearDn = scale   * (1 + smearDn * smearNrSigma);
+  const float corrScaleUp = scaleUp * (1 + smear   * smearNrSigma);
+  const float corrScaleDn = scaleDn * (1 + smear   * smearNrSigma);
 
-  // The total variation
   energyData[EGEnergySysIndex::kScaleUp] = oldEcalEnergy * corrScaleUp;
   energyData[EGEnergySysIndex::kScaleDown] = oldEcalEnergy * corrScaleDn;
   energyData[EGEnergySysIndex::kSmearUp] = oldEcalEnergy * corrSmearUp;
   energyData[EGEnergySysIndex::kSmearDown] = oldEcalEnergy * corrSmearDn;
 
+  // Compute nominal correction
+  const float corr = scale * (1 + smear * smearNrSigma);
 
+  // Apply the correction
+  const double newEcalEnergy = oldEcalEnergy * corr;
+  const double newEcalEnergyError = std::hypot(oldEcalEnergyError * corr, smear * newEcalEnergy);
+  photon.setCorrectedEnergy(reco::Photon::P4type::regression2, newEcalEnergy, newEcalEnergyError, true);
+
+  // Store post-correction values
   energyData[EGEnergySysIndex::kEcalPostCorr] = photon.getCorrectedEnergy(reco::Photon::P4type::regression2);
   energyData[EGEnergySysIndex::kEcalErrPostCorr] = photon.getCorrectedEnergyError(reco::Photon::P4type::regression2);
-}
+
+  
+  }
 
 double PhotonEnergyCalibrator::gauss(edm::StreamID const& id) const {
   if (rng_) {

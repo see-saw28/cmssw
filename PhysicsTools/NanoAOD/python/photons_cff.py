@@ -116,7 +116,7 @@ run2_egamma_2017.toModify(
 
 run2_egamma_2018.toModify(
     calibratedPatPhotonsNano,
-    correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/EGMScalesSmearing_Ele_2018.v1.json.gz")
+    correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/EGMScalesSmearing_Pho_2018.v1.json.gz:EGMScale_Compound_Pho_2018:EGMSmearAndSyst_PhoPTsplit_2018")
 )
 
 slimmedPhotonsWithUserData = cms.EDProducer("PATPhotonUserDataEmbedder",

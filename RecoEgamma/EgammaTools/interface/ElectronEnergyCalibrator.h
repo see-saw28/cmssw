@@ -59,7 +59,8 @@ private:
                                  const EnergyScaleCorrection::ScaleCorrection& scaleCorr,
                                  const EnergyScaleCorrection::SmearCorrection& smearCorr,
                                  reco::GsfElectron& ele,
-                                 std::array<float, EGEnergySysIndex::kNrSysErrs>& energyData) const;
+                                 std::array<float, EGEnergySysIndex::kNrSysErrs>& energyData,
+                                 const bool isMC) const;
 
   void setEcalEnergy(reco::GsfElectron& ele, const float scale, const float smear) const;
   std::pair<float, float> calCombinedMom(reco::GsfElectron& ele, const float scale, const float smear) const;

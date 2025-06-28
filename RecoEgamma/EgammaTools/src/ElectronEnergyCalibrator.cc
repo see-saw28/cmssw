@@ -83,9 +83,9 @@ std::array<float, EGEnergySysIndex::kNrSysErrs> ElectronEnergyCalibrator::calibr
   //to the estimate of the resolution contained in caloEnergyError
   //MC gets all the scale systematics
   if (eventType == EventType::DATA) {
-    setEnergyAndSystVarations(scaleCorr->scale(), 0., *scaleCorr, *smearCorr, ele, uncertainties);
+    setEnergyAndSystVarations(scaleCorr.scale(), 0., *scaleCorr, *smearCorr, ele, uncertainties, false);
   } else if (eventType == EventType::MC) {
-    setEnergyAndSystVarations(1.0, smearNrSigma, *scaleCorr, *smearCorr, ele, uncertainties);
+    setEnergyAndSystVarations(1.0, smearNrSigma, *scaleCorr, *smearCorr, ele, uncertainties, true);
   }
 
   return uncertainties;
@@ -97,30 +97,59 @@ void ElectronEnergyCalibrator::setEnergyAndSystVarations(
     const EnergyScaleCorrection::ScaleCorrection& scaleCorr,
     const EnergyScaleCorrection::SmearCorrection& smearCorr,
     reco::GsfElectron& ele,
-    std::array<float, EGEnergySysIndex::kNrSysErrs>& energyData) const {
+    std::array<float, EGEnergySysIndex::kNrSysErrs>& energyData,
+    const bool isMC) const {
 
+  // Get smear and systematics variations
   const float smear = smearCorr.sigma();
   const float smearUp = smearCorr.sigmaUp();
   const float smearDn = smearCorr.sigmaDown();
 
-  const float corr = scale + smear * smearNrSigma;
-  const float corrSmearUp = scale + smearUp * smearNrSigma;
-  const float corrSmearDn = scale + smearDn * smearNrSigma;
-  
-  const float corrScaleUp = smearCorr.scaleUp();
-  const float corrScaleDn = smearCorr.scaleDown();
+  // In data we need to apply the nominal scale AND the scale uncertainties
+  // In MC we need to apply only the scale uncertainties
+  // scaleCorr.scaleUp() = scaleCorr.scale() x smearCorr.scaleUp()
+  // scaleCorr.scaleDown() = scaleCorr.scale() x smearCorr.scaleDown()
+  float scaleUp = 1.0, scaleDn = 1.0;
+  if (isMC) {
+    scaleUp = smearCorr.scaleUp();
+    scaleDn = smearCorr.scaleDown();
+  } else {
+    scaleUp = scaleCorr.scaleUp();
+    scaleDn = scaleCorr.scaleDown();
+  }
 
+  // Store scale and smear values
+  energyData[EGEnergySysIndex::kScaleValue] = scale;
+  energyData[EGEnergySysIndex::kSmearValue] = smear;  //even though we use scale = 1.0, we still store the value returned for MC
+  energyData[EGEnergySysIndex::kSmearNrSigma] = smearNrSigma;
+
+  energyData[EGEnergySysIndex::kSmearUpValue] = smearUp;
+  energyData[EGEnergySysIndex::kSmearDownValue] = smearDn;
+  energyData[EGEnergySysIndex::kScaleUpValue] = scaleUp;
+  energyData[EGEnergySysIndex::kScaleDownValue] = scaleDn;
+
+  // Store pre-correction values
   const math::XYZTLorentzVector oldP4 = ele.p4();
   energyData[EGEnergySysIndex::kEcalTrkPreCorr] = ele.energy();
   energyData[EGEnergySysIndex::kEcalTrkErrPreCorr] = ele.corrections().combinedP4Error;
   energyData[EGEnergySysIndex::kEcalPreCorr] = ele.ecalEnergy();
   energyData[EGEnergySysIndex::kEcalErrPreCorr] = ele.ecalEnergyError();
 
-  energyData[EGEnergySysIndex::kScaleUp] = calCombinedMom(ele, corrScaleUp, smear).first;
+  // Compute sytematics variations
+  const float corrSmearUp = scale   * (1 + smearUp * smearNrSigma);
+  const float corrSmearDn = scale   * (1 + smearDn * smearNrSigma);
+  const float corrScaleUp = scaleUp * (1 + smear   * smearNrSigma);
+  const float corrScaleDn = scaleDn * (1 + smear   * smearNrSigma);
+
+  energyData[EGEnergySysIndex::kScaleUp]   = calCombinedMom(ele, corrScaleUp, smear).first;
   energyData[EGEnergySysIndex::kScaleDown] = calCombinedMom(ele, corrScaleDn, smear).first;
-  energyData[EGEnergySysIndex::kSmearUp] = calCombinedMom(ele, corrSmearUp, smearUp).first;
+  energyData[EGEnergySysIndex::kSmearUp]   = calCombinedMom(ele, corrSmearUp, smearUp).first;
   energyData[EGEnergySysIndex::kSmearDown] = calCombinedMom(ele, corrSmearDn, smearDn).first;
 
+  // Compute nominal correction
+  const float corr = scale * (1 + smear * smearNrSigma);
+
+  // Apply the correction 
   const std::pair<float, float> combinedMomentum = calCombinedMom(ele, corr, smear);
   setEcalEnergy(ele, corr, smear);
   const float energyCorr = combinedMomentum.first / oldP4.t();
@@ -129,9 +158,10 @@ void ElectronEnergyCalibrator::setEnergyAndSystVarations(
       oldP4.x() * energyCorr, oldP4.y() * energyCorr, oldP4.z() * energyCorr, combinedMomentum.first);
 
   ele.correctMomentum(newP4, ele.trackMomentumError(), combinedMomentum.second);
-  energyData[EGEnergySysIndex::kEcalTrkPostCorr] = ele.energy();
-  energyData[EGEnergySysIndex::kEcalTrkErrPostCorr] = ele.corrections().combinedP4Error;
 
+  // Store post-correction values
+  energyData[EGEnergySysIndex::kEcalTrkPostCorr] = combinedMomentum.first; // ele.energy();
+  energyData[EGEnergySysIndex::kEcalTrkErrPostCorr] = ele.corrections().combinedP4Error;
   energyData[EGEnergySysIndex::kEcalPostCorr] = ele.ecalEnergy();
   energyData[EGEnergySysIndex::kEcalErrPostCorr] = ele.ecalEnergyError();
 }
