@@ -66,7 +66,7 @@ public:
 
 
 
-  EnergyScaleCorrection(const std::string& correctionFileName,  const std::string& correctionSetScale = "EGMScale_Compound_Ele_2018", const std::string& correctionSetSmear = "EGMSmearAndSyst_ElePTsplit_2018", unsigned int genSeed = 0);
+  EnergyScaleCorrection(const std::string& correctionFileName, unsigned int genSeed = 0);
   EnergyScaleCorrection() {}
   ~EnergyScaleCorrection() {}
 

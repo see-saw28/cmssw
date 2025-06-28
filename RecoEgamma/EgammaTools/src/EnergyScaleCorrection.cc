@@ -11,13 +11,17 @@
 #include <iterator>
 #include "correction.h"
 
-EnergyScaleCorrection::EnergyScaleCorrection(const std::string& correctionFileName,
-  const std::string& correctionSetScale,
-  const std::string& correctionSetSmear,
-  unsigned int genSeed)
+EnergyScaleCorrection::EnergyScaleCorrection(const std::string& correctionFileName, unsigned int genSeed)
 {
 if (!correctionFileName.empty()) {
-auto cset = correction::CorrectionSet::from_file(correctionFileName);
+
+  // Split correctionFileName on ':'
+  std::string correctionFile, correctionSetScale, correctionSetSmear;
+  std::istringstream ss(correctionFileName);
+  std::getline(ss, correctionFile, ':');
+  std::getline(ss, correctionSetScale, ':');
+  std::getline(ss, correctionSetSmear, ':');
+auto cset = correction::CorrectionSet::from_file(correctionFile);
 
 corrScale = cset->compound().at(correctionSetScale);
 if (!corrScale) {
