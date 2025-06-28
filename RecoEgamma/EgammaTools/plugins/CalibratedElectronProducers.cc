@@ -60,11 +60,9 @@ private:
 
 template <typename T>
 const std::vector<int> CalibratedElectronProducerT<T>::valMapsToStore_ = {
-    EGEnergySysIndex::kScaleStatUp,       EGEnergySysIndex::kScaleStatDown,     EGEnergySysIndex::kScaleSystUp,
-    EGEnergySysIndex::kScaleSystDown,     EGEnergySysIndex::kScaleGainUp,       EGEnergySysIndex::kScaleGainDown,
-    EGEnergySysIndex::kSmearRhoUp,        EGEnergySysIndex::kSmearRhoDown,      EGEnergySysIndex::kSmearPhiUp,
-    EGEnergySysIndex::kSmearPhiDown,      EGEnergySysIndex::kScaleUp,           EGEnergySysIndex::kScaleDown,
-    EGEnergySysIndex::kSmearUp,           EGEnergySysIndex::kSmearDown,         EGEnergySysIndex::kScaleValue,
+    EGEnergySysIndex::kScaleUp,           EGEnergySysIndex::kScaleDown,         EGEnergySysIndex::kScaleUpValue,
+    EGEnergySysIndex::kScaleDownValue,    EGEnergySysIndex::kSmearUp,           EGEnergySysIndex::kSmearDown,
+    EGEnergySysIndex::kSmearUpValue,      EGEnergySysIndex::kSmearDownValue,    EGEnergySysIndex::kScaleValue,
     EGEnergySysIndex::kSmearValue,        EGEnergySysIndex::kSmearNrSigma,      EGEnergySysIndex::kEcalPreCorr,
     EGEnergySysIndex::kEcalErrPreCorr,    EGEnergySysIndex::kEcalPostCorr,      EGEnergySysIndex::kEcalErrPostCorr,
     EGEnergySysIndex::kEcalTrkPreCorr,    EGEnergySysIndex::kEcalTrkErrPreCorr, EGEnergySysIndex::kEcalTrkPostCorr,

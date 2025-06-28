@@ -38,7 +38,11 @@ std::array<float, EGEnergySysIndex::kNrSysErrs> ElectronEnergyCalibrator::calibr
     std::array<float, EGEnergySysIndex::kNrSysErrs> retVal;
     retVal.fill(ele.energy());
     retVal[EGEnergySysIndex::kScaleValue] = 1.0;
+    retVal[EGEnergySysIndex::kScaleUpValue] = 1.0;
+    retVal[EGEnergySysIndex::kScaleDownValue] = 1.0;
     retVal[EGEnergySysIndex::kSmearValue] = 0.0;
+    retVal[EGEnergySysIndex::kSmearUpValue] = 0.0;
+    retVal[EGEnergySysIndex::kSmearDownValue] = 0.0;
     retVal[EGEnergySysIndex::kSmearNrSigma] = smearNrSigma;
     retVal[EGEnergySysIndex::kEcalPreCorr] = ele.ecalEnergy();
     retVal[EGEnergySysIndex::kEcalErrPreCorr] = ele.ecalEnergyError();
@@ -72,9 +76,7 @@ std::array<float, EGEnergySysIndex::kNrSysErrs> ElectronEnergyCalibrator::calibr
 
   std::array<float, EGEnergySysIndex::kNrSysErrs> uncertainties{};
 
-  uncertainties[EGEnergySysIndex::kScaleValue] = scaleCorr->scale();
-  uncertainties[EGEnergySysIndex::kSmearValue] = smearCorr->sigma();  //even though we use scale = 1.0, we still store the value returned for MC
-  uncertainties[EGEnergySysIndex::kSmearNrSigma] = smearNrSigma;
+  
   //MC central values are not scaled (scale = 1.0), data is not smeared (smearNrSigma = 0)
   //the smearing (or resolution extra parameter as it might better be called)
   //still has a second order effect on data as it enters the E/p combination as an adjustment

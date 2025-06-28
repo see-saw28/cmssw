@@ -237,15 +237,22 @@ run2_egamma.toModify(slimmedElectronsWithUserData.userFloats,
 
 run2_egamma.toModify(
     slimmedElectronsWithUserData.userFloats,
+    ecalTrkEnergyErrPreCorrNew  = cms.InputTag("calibratedPatElectronsNano","ecalTrkEnergyErrPreCorr"),
     ecalTrkEnergyErrPostCorrNew = cms.InputTag("calibratedPatElectronsNano","ecalTrkEnergyErrPostCorr"),
     ecalTrkEnergyPreCorrNew     = cms.InputTag("calibratedPatElectronsNano","ecalTrkEnergyPreCorr"),
     ecalTrkEnergyPostCorrNew    = cms.InputTag("calibratedPatElectronsNano","ecalTrkEnergyPostCorr"),
-    Scale                       = cms.InputTag("calibratedPatElectronsNano","energyScaleValue"),
-    Smear                       = cms.InputTag("calibratedPatElectronsNano","energySigmaValue"),
     energyScaleUpNew            = cms.InputTag("calibratedPatElectronsNano","energyScaleUp"),
     energyScaleDownNew          = cms.InputTag("calibratedPatElectronsNano","energyScaleDown"),
     energySigmaUpNew            = cms.InputTag("calibratedPatElectronsNano","energySigmaUp"),
-    energySigmaDownNew          = cms.InputTag("calibratedPatElectronsNano","energySigmaDown")
+    energySigmaDownNew          = cms.InputTag("calibratedPatElectronsNano","energySigmaDown"),
+    
+    Scale                       = cms.InputTag("calibratedPatElectronsNano","scaleValue"),
+    Smear                       = cms.InputTag("calibratedPatElectronsNano","sigmaValue"),
+    SmearUp                     = cms.InputTag("calibratedPatElectronsNano","sigmaUpValue"),
+    SmearDown                   = cms.InputTag("calibratedPatElectronsNano","sigmaDownValue"),
+    ScaleUp                     = cms.InputTag("calibratedPatElectronsNano","scaleUpValue"),
+    ScaleDown                   = cms.InputTag("calibratedPatElectronsNano","scaleDownValue"),
+    smearNrSigma                = cms.InputTag("calibratedPatElectronsNano","smearNrSigma")
 )
 
 (run2_egamma_2016).toModify(
@@ -465,6 +472,11 @@ _eleVarsExtra = cms.PSet(
         energyErr = Var("userFloat('ecalTrkEnergyErrPostCorrNew')", float, precision=6, doc="energy error of the cluster-track combination"),
         Scale = Var("userFloat('Scale')", float, precision=-1, doc="energy error of the cluster-track combination"),
         Smear = Var("userFloat('Smear')", float, precision=-1, doc="energy error of the cluster-track combination"),
+        ScaleUp = Var("userFloat('ScaleUp')", float, precision=-1, doc="energy error of the cluster-track combination"),
+        ScaleDown = Var("userFloat('ScaleDown')", float, precision=-1, doc="energy error of the cluster-track combination"),
+        SmearUp = Var("userFloat('SmearUp')", float, precision=-1, doc="energy error of the cluster-track combination"),
+        SmearDown = Var("userFloat('SmearDown')", float, precision=-1, doc="energy error of the cluster-track combination"),
+        smearNrSigma = Var("userFloat('smearNrSigma')", float, precision=-1, doc="energy error of the cluster-track combination"),
         ptPreCorr = Var("pt", float, doc="pt of the electron before energy corrections"),
         scEtOverPt = Var("(superCluster().energy()/(pt*userFloat('ecalTrkEnergyPostCorrNew')/userFloat('ecalTrkEnergyPreCorrNew')*cosh(superCluster().eta())))-1",float,doc="(supercluster transverse energy)/pt-1",precision=8),
         dEscaleUp=Var("userFloat('ecalTrkEnergyPostCorrNew')-userFloat('energyScaleUpNew')", float,  doc="ecal energy scale shifted 1 sigma up(adding gain/stat/syst in quadrature)", precision=8),

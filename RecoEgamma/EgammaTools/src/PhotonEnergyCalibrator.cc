@@ -37,7 +37,11 @@ std::array<float, EGEnergySysIndex::kNrSysErrs> PhotonEnergyCalibrator::calibrat
     std::array<float, EGEnergySysIndex::kNrSysErrs> retVal;
     retVal.fill(photon.getCorrectedEnergy(reco::Photon::P4type::regression2));
     retVal[EGEnergySysIndex::kScaleValue] = 1.0;
+    retVal[EGEnergySysIndex::kScaleUpValue] = 1.0;
+    retVal[EGEnergySysIndex::kScaleDownValue] = 1.0;
     retVal[EGEnergySysIndex::kSmearValue] = 0.0;
+    retVal[EGEnergySysIndex::kSmearUpValue] = 0.0;
+    retVal[EGEnergySysIndex::kSmearDownValue] = 0.0;
     retVal[EGEnergySysIndex::kSmearNrSigma] = smearNrSigma;
     retVal[EGEnergySysIndex::kEcalErrPreCorr] = photon.getCorrectedEnergyError(reco::Photon::P4type::regression2);
     retVal[EGEnergySysIndex::kEcalErrPostCorr] = photon.getCorrectedEnergyError(reco::Photon::P4type::regression2);
@@ -70,13 +74,7 @@ std::array<float, EGEnergySysIndex::kNrSysErrs> PhotonEnergyCalibrator::calibrat
 
   std::array<float, EGEnergySysIndex::kNrSysErrs> uncertainties{};
 
-  uncertainties[EGEnergySysIndex::kSmearRhoUp] = et;
-  uncertainties[EGEnergySysIndex::kSmearRhoDown] = scEta;
-  uncertainties[EGEnergySysIndex::kSmearPhiUp] = photon.full5x5_r9();
 
-  uncertainties[EGEnergySysIndex::kScaleValue] = scaleCorr->scale();
-  uncertainties[EGEnergySysIndex::kSmearValue] = smearCorr->sigma();  //even though we use scale = 1.0, we still store the value returned for MC
-  uncertainties[EGEnergySysIndex::kSmearNrSigma] = smearNrSigma;
   //MC central values are not scaled (scale = 1.0), data is not smeared (smearNrSigma = 0)
   //smearing still has a second order effect on data as it enters the E/p combination as an
   //extra uncertainty on the calo energy
