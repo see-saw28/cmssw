@@ -83,7 +83,7 @@ std::array<float, EGEnergySysIndex::kNrSysErrs> ElectronEnergyCalibrator::calibr
   //to the estimate of the resolution contained in caloEnergyError
   //MC gets all the scale systematics
   if (eventType == EventType::DATA) {
-    setEnergyAndSystVarations(scaleCorr.scale(), 0., *scaleCorr, *smearCorr, ele, uncertainties, false);
+    setEnergyAndSystVarations(scaleCorr->scale(), 0., *scaleCorr, *smearCorr, ele, uncertainties, false);
   } else if (eventType == EventType::MC) {
     setEnergyAndSystVarations(1.0, smearNrSigma, *scaleCorr, *smearCorr, ele, uncertainties, true);
   }
