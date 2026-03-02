@@ -1,7 +1,7 @@
 #include "RecoEgamma/EgammaTools/interface/ElectronEnergyCalibrator.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "FWCore/Utilities/interface/RandomNumberGenerator.h"
+#include "FWCore/AbstractServices/interface/RandomNumberGenerator.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/Utilities/interface/isFinite.h"
 #include <CLHEP/Random/RandGaussQ.h>
@@ -129,7 +129,6 @@ void ElectronEnergyCalibrator::setEnergyAndSystVarations(
   energyData[EGEnergySysIndex::kScaleDownValue] = scaleDn;
 
   // Store pre-correction values
-  const math::XYZTLorentzVector oldP4 = ele.p4();
   energyData[EGEnergySysIndex::kEcalTrkPreCorr] = ele.energy();
   energyData[EGEnergySysIndex::kEcalTrkErrPreCorr] = ele.corrections().combinedP4Error;
   energyData[EGEnergySysIndex::kEcalPreCorr] = ele.ecalEnergy();
@@ -141,27 +140,17 @@ void ElectronEnergyCalibrator::setEnergyAndSystVarations(
   const float corrScaleUp = scaleUp * (1 + smear   * smearNrSigma);
   const float corrScaleDn = scaleDn * (1 + smear   * smearNrSigma);
 
-  energyData[EGEnergySysIndex::kScaleUp]   = calCombinedMom(ele, corrScaleUp, smear).first;
-  energyData[EGEnergySysIndex::kScaleDown] = calCombinedMom(ele, corrScaleDn, smear).first;
-  energyData[EGEnergySysIndex::kSmearUp]   = calCombinedMom(ele, corrSmearUp, smearUp).first;
-  energyData[EGEnergySysIndex::kSmearDown] = calCombinedMom(ele, corrSmearDn, smearDn).first;
+  energyData[EGEnergySysIndex::kScaleUp]   = ele.energy() * corrScaleUp;
+  energyData[EGEnergySysIndex::kScaleDown] = ele.energy() * corrScaleDn;
+  energyData[EGEnergySysIndex::kSmearUp]   = ele.energy() * corrSmearUp;
+  energyData[EGEnergySysIndex::kSmearDown] = ele.energy() * corrSmearDn;
 
   // Compute nominal correction
   const float corr = scale * (1 + smear * smearNrSigma);
 
-  // Apply the correction 
-  const std::pair<float, float> combinedMomentum = calCombinedMom(ele, corr, smear);
-  setEcalEnergy(ele, corr, smear);
-  const float energyCorr = combinedMomentum.first / oldP4.t();
-
-  const math::XYZTLorentzVector newP4(
-      oldP4.x() * energyCorr, oldP4.y() * energyCorr, oldP4.z() * energyCorr, combinedMomentum.first);
-
-  ele.correctMomentum(newP4, ele.trackMomentumError(), combinedMomentum.second);
-
   // Store post-correction values
-  energyData[EGEnergySysIndex::kEcalTrkPostCorr] = combinedMomentum.first; // ele.energy();
-  energyData[EGEnergySysIndex::kEcalTrkErrPostCorr] = ele.corrections().combinedP4Error;
+  energyData[EGEnergySysIndex::kEcalTrkPostCorr] = ele.energy() * corr;
+  energyData[EGEnergySysIndex::kEcalTrkErrPostCorr] = std::hypot(ele.corrections().combinedP4Error * scale, ele.energy() * smear * scale);
   energyData[EGEnergySysIndex::kEcalPostCorr] = ele.ecalEnergy();
   energyData[EGEnergySysIndex::kEcalErrPostCorr] = ele.ecalEnergyError();
 }

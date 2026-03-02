@@ -77,7 +77,7 @@ const EnergyScaleCorrection::ScaleCorrection* EnergyScaleCorrection::getScaleCor
     
     // build the input vector of the evaluator
     std::vector<correction::Variable::Type> input_vector = {
-      std::string("scale"), static_cast<double>(runnr), ScEta, r9, std::abs(ScEta), et, static_cast<double>(gainSeed)
+      std::string("scale"), static_cast<double>(runnr), ScEta, r9, et, static_cast<double>(gainSeed)
     };
 
     double scaleValue = corrScale->evaluate(input_vector);
@@ -97,7 +97,7 @@ const EnergyScaleCorrection::SmearCorrection* EnergyScaleCorrection::getSmearCor
   
   // build the input vector of the evaluator
   std::vector<correction::Variable::Type> input_vector = {
-    std::string("smear"), et, r9, std::abs(ScEta)
+    std::string("smear"), et, r9, ScEta
   };
 
   double smearValue = corrSmear->evaluate(input_vector);

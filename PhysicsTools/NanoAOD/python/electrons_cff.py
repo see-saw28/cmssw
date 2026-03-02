@@ -468,6 +468,7 @@ _eleVarsExtra = cms.PSet(
         electronTable.variables,
         pt = Var("pt*userFloat('ecalTrkEnergyPostCorrNew')/userFloat('ecalTrkEnergyPreCorrNew')", float, precision=-1, doc="p_{T}"),
         energyErr = Var("userFloat('ecalTrkEnergyErrPostCorrNew')", float, precision=6, doc="energy error of the cluster-track combination"),
+        energyErrPreCorr = Var("userFloat('ecalTrkEnergyErrPreCorrNew')",float,doc="energy error of the cluster from regression",precision=6),
         Scale = Var("userFloat('Scale')", float, precision=-1, doc="energy error of the cluster-track combination"),
         Smear = Var("userFloat('Smear')", float, precision=-1, doc="energy error of the cluster-track combination"),
         ScaleUp = Var("userFloat('ScaleUp')", float, precision=-1, doc="energy error of the cluster-track combination"),
