@@ -143,7 +143,7 @@ run2_egamma_2017.toModify(
 
 run2_egamma_2018.toModify(
     calibratedPatElectronsNano,
-    correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/EGMScalesSmearing_Ele_2018.v1.json.gz:EGMScale_Compound_Ele_2018:EGMSmearAndSyst_ElePTsplit_2018",
+    correctionFile = "/cvmfs/cms-griddata.cern.ch/cat/metadata/EGM/Run2-2018-UL-NanoAODv15/2025-12-05/electronSS_EtDependent.json.gz:Scale:SmearAndSyst",
 
 )
 ##############################end calibratedPatElectronsNano############################33

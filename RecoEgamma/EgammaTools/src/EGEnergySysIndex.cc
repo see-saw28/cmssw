@@ -3,16 +3,16 @@
 namespace {
   std::array<std::string, EGEnergySysIndex::kNrSysErrs> makeEGEnergySysNames() {
     std::array<std::string, EGEnergySysIndex::kNrSysErrs> names;
+    names[EGEnergySysIndex::kScaleValue] = "scaleValue";
     names[EGEnergySysIndex::kScaleUp] = "energyScaleUp";
     names[EGEnergySysIndex::kScaleDown] = "energyScaleDown";
     names[EGEnergySysIndex::kScaleUpValue] = "scaleUpValue";
     names[EGEnergySysIndex::kScaleDownValue] = "scaleDownValue";
+    names[EGEnergySysIndex::kSmearValue] = "sigmaValue";
     names[EGEnergySysIndex::kSmearUp] = "energySigmaUp";
     names[EGEnergySysIndex::kSmearDown] = "energySigmaDown";
     names[EGEnergySysIndex::kSmearUpValue] = "sigmaUpValue";
     names[EGEnergySysIndex::kSmearDownValue] = "sigmaDownValue";
-    names[EGEnergySysIndex::kScaleValue] = "scaleValue";
-    names[EGEnergySysIndex::kSmearValue] = "sigmaValue";
     names[EGEnergySysIndex::kSmearNrSigma] = "smearNrSigma";
     names[EGEnergySysIndex::kEcalPreCorr] = "ecalEnergyPreCorr";
     names[EGEnergySysIndex::kEcalErrPreCorr] = "ecalEnergyErrPreCorr";

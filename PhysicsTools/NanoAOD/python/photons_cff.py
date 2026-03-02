@@ -116,7 +116,7 @@ run2_egamma_2017.toModify(
 
 run2_egamma_2018.toModify(
     calibratedPatPhotonsNano,
-    correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/EGMScalesSmearing_Pho_2018.v1.json.gz:EGMScale_Compound_Pho_2018:EGMSmearAndSyst_PhoPTsplit_2018")
+    correctionFile = cms.string("/cvmfs/cms-griddata.cern.ch/cat/metadata/EGM/Run2-2018-UL-NanoAODv15/2025-12-05/photonSS_EtDependent.json.gz:Scale:SmearAndSyst")
 )
 
 slimmedPhotonsWithUserData = cms.EDProducer("PATPhotonUserDataEmbedder",
@@ -300,7 +300,7 @@ run2_egamma.toModify(
     SmearUp = Var("userFloat('SmearUp')", float, precision=-1, doc="energy error of the cluster-track combination"),
     SmearDown = Var("userFloat('SmearDown')", float, precision=-1, doc="energy error of the cluster-track combination"),
     smearNrSigma = Var("userFloat('smearNrSigma')", float, precision=-1, doc="energy error of the cluster-track combination"),
-    ptPreCorr = Var("pt",float,doc="pt of the photon before energy corrections"),
+    ptPreCorr = Var("pt", float, doc="pt of the photon before energy corrections"),
     cutBased = Var(
             "userInt('cutBasedID_Fall17V2_loose')+userInt('cutBasedID_Fall17V2_medium')+userInt('cutBasedID_Fall17V2_tight')",
             "uint8",
@@ -345,10 +345,10 @@ photonMCTable = cms.EDProducer("CandMCMatchTableProducer",
 #adding 4 most imp scale & smearing variables to table
 run2_egamma.toModify(
     photonTable.variables,
-    dEscaleUp=Var("userFloat('ecalEnergyPostCorrNew') - userFloat('energyScaleUpNew')", float, doc="ecal energy scale shifted 1 sigma up (adding gain/stat/syst in quadrature)", precision=-1),
-    dEscaleDown=Var("userFloat('ecalEnergyPostCorrNew') - userFloat('energyScaleDownNew')", float, doc="ecal energy scale shifted 1 sigma down (adding gain/stat/syst in quadrature)", precision=-1),
-    dEsigmaUp=Var("userFloat('ecalEnergyPostCorrNew') - userFloat('energySigmaUpNew')", float, doc="ecal energy smearing value shifted 1 sigma up", precision=-1),
-    dEsigmaDown=Var("userFloat('ecalEnergyPostCorrNew') - userFloat('energySigmaDownNew')", float, doc="ecal energy smearing value shifted 1 sigma up", precision=-1),
+    EscaleUp=Var("userFloat('energyScaleUpNew')", float, doc="ecal energy scale shifted 1 sigma up (adding gain/stat/syst in quadrature)", precision=-1),
+    EscaleDown=Var("userFloat('energyScaleDownNew')", float, doc="ecal energy scale shifted 1 sigma down (adding gain/stat/syst in quadrature)", precision=-1),
+    EsigmaUp=Var("userFloat('energySigmaUpNew')", float, doc="ecal energy smearing value shifted 1 sigma up", precision=-1),
+    EsigmaDown=Var("userFloat('energySigmaDownNew')", float, doc="ecal energy smearing value shifted 1 sigma up", precision=-1),
 )
 
 
